@@ -360,6 +360,29 @@ if (typeof window !== 'undefined') {
   window.getStudyRecommendations = getStudyRecommendations;
 }
 
+// ES6 模块导出
+export {
+  loadMasteredItems,
+  saveMastered,
+  isMastered,
+  getMasteredCount,
+  loadProgress,
+  saveProgress,
+  markItemVisited,
+  getVisitedCount,
+  saveQuizResult,
+  getQuizStats,
+  saveLastVisited,
+  getLastVisited,
+  loadSettings,
+  saveSetting,
+  exportData,
+  importData,
+  clearAllData,
+  getOverallStats,
+  getStudyRecommendations
+};
+
 // 如果在 Node.js 环境中，导出模块
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
