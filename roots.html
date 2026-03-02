@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>策略索引 - RAG优化策略工坊</title>
+
+  <!-- SEO 基础 -->
+  <meta name="description" content="RAG优化策略完整索引，支持搜索和分类筛选，快速定位所需的优化技术。">
+  <meta name="keywords" content="RAG优化策略,索引,搜索,分类,技术目录">
+  <meta name="author" content="乔木">
+  <meta name="language" content="zh-CN">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://rag-optimization-workshop.vercel.app/roots.html">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="策略索引 - RAG优化策略工坊">
+  <meta property="og:description" content="RAG优化策略完整索引，支持搜索和分类筛选，快速定位所需的优化技术。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rag-optimization-workshop.vercel.app/roots.html">
+  <meta property="og:image" content="https://rag-optimization-workshop.vercel.app/icon-512.png">
+
+  <!-- PWA 支持 -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#FBBF24">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+
+  <!-- 字体和样式 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/minimal.css">
+</head>
+<body>
+  <!-- 导航栏 -->
+  <nav class="nav">
+    <div class="container">
+      <div class="nav-content">
+        <a href="index.html" class="nav-brand">RAG优化策略工坊</a>
+        <ul class="nav-links">
+          <li><a href="learn.html" class="nav-link">学习</a></li>
+          <li><a href="flashcard.html" class="nav-link">闪卡</a></li>
+          <li><a href="roots.html" class="nav-link active">索引</a></li>
+          <li><a href="progress.html" class="nav-link">进度</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主要内容 -->
+  <div class="container spacing-lg">
+    <!-- 页面标题 -->
+    <div class="index-header">
+      <h1 class="index-title">策略索引</h1>
+      <p class="index-subtitle">浏览和搜索所有RAG优化策略</p>
+    </div>
+
+    <!-- 搜索框 -->
+    <div class="search-section">
+      <input 
+        type="text" 
+        class="search-box" 
+        placeholder="搜索策略名称、描述或关键词..." 
+        id="searchInput"
+        oninput="filterItems()"
+      >
+    </div>
+
+    <!-- 分类筛选 -->
+    <div class="filter-section">
+      <div class="filter-buttons" id="filterButtons">
+        <button class="filter-btn active" onclick="filterByCategory('all')">全部策略</button>
+        <button class="filter-btn" onclick="filterByCategory('查询优化')">查询优化</button>
+        <button class="filter-btn" onclick="filterByCategory('分块策略')">分块策略</button>
+        <button class="filter-btn" onclick="filterByCategory('索引技术')">索引技术</button>
+        <button class="filter-btn" onclick="filterByCategory('检索方法')">检索方法</button>
+        <button class="filter-btn" onclick="filterByCategory('生成优化')">生成优化</button>
+        <button class="filter-btn" onclick="filterByCategory('数据优化')">数据优化</button>
+      </div>
+    </div>
+
+    <!-- 统计信息 -->
+    <div class="text-center text-sm text-muted spacing-md" id="statsText">
+      显示 40 个策略
+    </div>
+
+    <!-- 策略网格 -->
+    <div class="items-grid" id="itemsGrid">
+      <!-- 动态加载内容 -->
+    </div>
+
+    <!-- 无结果提示 -->
+    <div class="text-center spacing-xl hidden" id="noResults">
+      <h3>未找到匹配的策略</h3>
+      <p class="text-muted">请尝试其他搜索词或筛选条件</p>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script type="module">
+    import { WordRoots } from './js/wordData.js';
+    import { isMastered } from './js/storage.js';
+
+    let filteredItems = [...WordRoots];
+    let currentCategory = 'all';
+
+    // 渲染策略列表
+    function renderItems() {
+      const grid = document.getElementById('itemsGrid');
+      const noResults = document.getElementById('noResults');
+      const statsText = document.getElementById('statsText');
+      
+      if (filteredItems.length === 0) {
+        grid.innerHTML = '';
+        noResults.classList.remove('hidden');
+        statsText.textContent = '未找到匹配的策略';
+        return;
+      }
+      
+      noResults.classList.add('hidden');
+      statsText.textContent = `显示 ${filteredItems.length} 个策略`;
+      
+      grid.innerHTML = filteredItems.map(item => {
+        const mastered = isMastered(item.id);
+        const masteredIcon = mastered ? '★' : '';
+        
+        return `
+          <div class="card item-card" onclick="goToDetail(${item.id})">
+            <div class="item-header">
+              <h3 class="item-title">
+                ${masteredIcon} ${item.root}
+              </h3>
+              <span class="item-category">${item.origin}</span>
+            </div>
+            <p class="item-meaning">${item.meaning}</p>
+            <p class="item-description">${item.description}</p>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 跳转到详情页
+    window.goToDetail = function(id) {
+      window.location.href = `root-detail.html?id=${id}`;
+    };
+
+    // 按分类筛选
+    window.filterByCategory = function(category) {
+      currentCategory = category;
+      
+      // 更新按钮状态
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+      
+      // 应用筛选
+      applyFilters();
+    };
+
+    // 搜索筛选
+    window.filterItems = function() {
+      applyFilters();
+    };
+
+    // 应用所有筛选条件
+    function applyFilters() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      
+      filteredItems = WordRoots.filter(item => {
+        // 分类筛选
+        const categoryMatch = currentCategory === 'all' || item.origin === currentCategory;
+        
+        // 搜索筛选
+        const searchMatch = searchTerm === '' || 
+          item.root.toLowerCase().includes(searchTerm) ||
+          item.meaning.toLowerCase().includes(searchTerm) ||
+          item.description.toLowerCase().includes(searchTerm) ||
+          item.origin.toLowerCase().includes(searchTerm);
+        
+        return categoryMatch && searchMatch;
+      });
+      
+      renderItems();
+    }
+
+    // 获取所有分类
+    function getCategories() {
+      const categories = [...new Set(WordRoots.map(item => item.origin))];
+      return categories.sort();
+    }
+
+    // 初始化分类按钮
+    function initializeFilters() {
+      const filterButtons = document.getElementById('filterButtons');
+      const categories = getCategories();
+      
+      // 保留"全部策略"按钮，添加动态分类按钮
+      const allButton = filterButtons.querySelector('.filter-btn');
+      filterButtons.innerHTML = '';
+      filterButtons.appendChild(allButton);
+      
+      categories.forEach(category => {
+        const button = document.createElement('button');
+        button.className = 'filter-btn';
+        button.textContent = category;
+        button.onclick = () => filterByCategory(category);
+        filterButtons.appendChild(button);
+      });
+    }
+
+    // 键盘搜索快捷键
+    document.addEventListener('keydown', (e) => {
+      // Ctrl/Cmd + K 聚焦搜索框
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        document.getElementById('searchInput').focus();
+      }
+      
+      // ESC 清空搜索
+      if (e.key === 'Escape') {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput === document.activeElement) {
+          searchInput.value = '';
+          filterItems();
+          searchInput.blur();
+        }
+      }
+    });
+
+    // 搜索框快捷键提示
+    function addSearchHints() {
+      const searchInput = document.getElementById('searchInput');
+      const originalPlaceholder = searchInput.placeholder;
+      
+      searchInput.addEventListener('focus', () => {
+        searchInput.placeholder = '输入关键词搜索... (ESC 清空)';
+      });
+      
+      searchInput.addEventListener('blur', () => {
+        searchInput.placeholder = originalPlaceholder;
+      });
+    }
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeFilters();
+      renderItems();
+      addSearchHints();
+    });
+
+    // 监听掌握状态变化
+    window.addEventListener('masteredChanged', () => {
+      renderItems();
+    });
+  </script>
+
+  <!-- 存储模块 -->
+  <script src="js/storage.js"></script>
+</body>
+</html>

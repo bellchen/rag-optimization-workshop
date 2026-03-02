@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>学习进度 - RAG优化策略工坊</title>
+
+  <!-- SEO 基础 -->
+  <meta name="description" content="查看RAG优化策略学习进度，包括掌握情况、测试成绩和学习建议。">
+  <meta name="keywords" content="RAG优化策略,学习进度,统计,成绩,建议">
+  <meta name="author" content="乔木">
+  <meta name="language" content="zh-CN">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://rag-optimization-workshop.vercel.app/progress.html">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="学习进度 - RAG优化策略工坊">
+  <meta property="og:description" content="查看RAG优化策略学习进度，包括掌握情况、测试成绩和学习建议。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rag-optimization-workshop.vercel.app/progress.html">
+  <meta property="og:image" content="https://rag-optimization-workshop.vercel.app/icon-512.png">
+
+  <!-- PWA 支持 -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#FBBF24">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+
+  <!-- 字体和样式 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/minimal.css">
+</head>
+<body>
+  <!-- 导航栏 -->
+  <nav class="nav">
+    <div class="container">
+      <div class="nav-content">
+        <a href="index.html" class="nav-brand">RAG优化策略工坊</a>
+        <ul class="nav-links">
+          <li><a href="learn.html" class="nav-link">学习</a></li>
+          <li><a href="flashcard.html" class="nav-link">闪卡</a></li>
+          <li><a href="roots.html" class="nav-link">索引</a></li>
+          <li><a href="progress.html" class="nav-link active">进度</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主要内容 -->
+  <div class="progress-container">
+    <!-- 页面标题 -->
+    <div class="text-center spacing-lg">
+      <h1 class="text-4xl font-bold">学习进度</h1>
+      <p class="text-lg text-muted">跟踪您的RAG优化策略学习情况</p>
+    </div>
+
+    <!-- 总体统计 -->
+    <div class="progress-overview" id="overviewStats">
+      <!-- 动态加载统计数据 -->
+    </div>
+
+    <!-- 学习建议 -->
+    <div class="spacing-2xl" id="recommendationsSection">
+      <h2 class="progress-section-title">学习建议</h2>
+      <div id="recommendations">
+        <!-- 动态加载建议 -->
+      </div>
+    </div>
+
+    <!-- 分类掌握情况 -->
+    <div class="spacing-2xl">
+      <h2 class="progress-section-title">分类掌握情况</h2>
+      <div class="progress-overview" id="categoryStats">
+        <!-- 动态加载分类统计 -->
+      </div>
+    </div>
+
+    <!-- 已掌握策略列表 -->
+    <div class="progress-sections">
+      <div class="spacing-xl" id="masteredSection">
+        <h2 class="progress-section-title">已掌握策略 (<span id="masteredCount">0</span>)</h2>
+        <div class="mastered-list" id="masteredList">
+          <!-- 动态加载已掌握的策略 -->
+        </div>
+      </div>
+
+      <!-- 需要复习的策略 -->
+      <div class="spacing-xl" id="reviewSection">
+        <h2 class="progress-section-title">建议复习 (<span id="reviewCount">0</span>)</h2>
+        <div class="mastered-list" id="reviewList">
+          <!-- 动态加载需要复习的策略 -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 数据管理 -->
+    <div class="spacing-2xl">
+      <h2 class="progress-section-title">数据管理</h2>
+      <div class="text-center">
+        <div class="spacing-lg">
+          <button class="btn btn-secondary" onclick="exportProgress()">导出学习数据</button>
+          <button class="btn btn-secondary" onclick="importProgress()">导入学习数据</button>
+          <button class="btn btn-ghost" onclick="clearProgress()" style="color: #ef4444;">清除所有数据</button>
+        </div>
+        <p class="text-sm text-muted">数据存储在本地浏览器中，建议定期备份</p>
+      </div>
+    </div>
+
+    <!-- 隐藏的文件输入 -->
+    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="handleImport(event)">
+  </div>
+
+  <!-- JavaScript -->
+  <script type="module">
+    import { WordRoots } from './js/wordData.js';
+    import { 
+      getOverallStats, 
+      loadMasteredItems, 
+      getQuizStats,
+      getStudyRecommendations,
+      exportData,
+      importData,
+      clearAllData
+    } from './js/storage.js';
+
+    // 渲染总体统计
+    function renderOverviewStats() {
+      const stats = getOverallStats();
+      const quizStats = getQuizStats();
+      
+      document.getElementById('overviewStats').innerHTML = `
+        <div class="card progress-card">
+          <div class="progress-number">${stats.mastered}</div>
+          <div class="progress-label">已掌握策略</div>
+        </div>
+        <div class="card progress-card">
+          <div class="progress-number">${Math.round(stats.masteredPercentage)}%</div>
+          <div class="progress-label">掌握率</div>
+        </div>
+        <div class="card progress-card">
+          <div class="progress-number">${stats.visited}</div>
+          <div class="progress-label">已学习策略</div>
+        </div>
+        <div class="card progress-card">
+          <div class="progress-number">${Math.round(quizStats.accuracy)}%</div>
+          <div class="progress-label">测试正确率</div>
+        </div>
+      `;
+    }
+
+    // 渲染学习建议
+    function renderRecommendations() {
+      const recommendations = getStudyRecommendations();
+      const container = document.getElementById('recommendations');
+      
+      if (recommendations.length === 0) {
+        container.innerHTML = `
+          <div class="card">
+            <p class="text-center text-muted">继续保持良好的学习状态！</p>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = recommendations.map(rec => `
+        <div class="card" style="margin-bottom: 16px;">
+          <h4 style="margin-bottom: 8px; color: var(--color-primary-dark);">${rec.title}</h4>
+          <p style="margin: 0; color: var(--color-text-light);">${rec.description}</p>
+        </div>
+      `).join('');
+    }
+
+    // 渲染分类统计
+    function renderCategoryStats() {
+      const masteredItems = loadMasteredItems();
+      const categories = {};
+      
+      // 统计每个分类的总数和已掌握数
+      WordRoots.forEach(item => {
+        if (!categories[item.origin]) {
+          categories[item.origin] = { total: 0, mastered: 0 };
+        }
+        categories[item.origin].total++;
+        if (masteredItems.includes(item.id)) {
+          categories[item.origin].mastered++;
+        }
+      });
+      
+      const categoryStatsHtml = Object.entries(categories).map(([category, stats]) => {
+        const percentage = Math.round((stats.mastered / stats.total) * 100);
+        return `
+          <div class="card progress-card">
+            <div class="progress-number">${stats.mastered}/${stats.total}</div>
+            <div class="progress-label">${category}</div>
+            <div style="margin-top: 8px; font-size: 14px; color: var(--color-text-light);">
+              ${percentage}% 掌握
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      document.getElementById('categoryStats').innerHTML = categoryStatsHtml;
+    }
+
+    // 渲染已掌握策略
+    function renderMasteredItems() {
+      const masteredItems = loadMasteredItems();
+      const masteredStrategies = WordRoots.filter(item => masteredItems.includes(item.id));
+      
+      document.getElementById('masteredCount').textContent = masteredStrategies.length;
+      
+      if (masteredStrategies.length === 0) {
+        document.getElementById('masteredList').innerHTML = `
+          <div class="text-center text-muted">
+            <p>还没有掌握任何策略</p>
+            <a href="learn.html" class="btn btn-primary" style="margin-top: 16px;">开始学习</a>
+          </div>
+        `;
+        return;
+      }
+      
+      document.getElementById('masteredList').innerHTML = masteredStrategies.map(item => `
+        <div class="mastered-item" onclick="goToDetail(${item.id})">
+          <span class="mastered-icon">★</span>
+          <span class="mastered-text">${item.root}</span>
+        </div>
+      `).join('');
+    }
+
+    // 渲染需要复习的策略
+    function renderReviewItems() {
+      const masteredItems = loadMasteredItems();
+      const quizResults = JSON.parse(localStorage.getItem('rag_workshop_quiz_results') || '{}');
+      
+      // 找出测试正确率低于70%的已掌握策略
+      const reviewItems = WordRoots.filter(item => {
+        if (!masteredItems.includes(item.id)) return false;
+        
+        const itemResults = quizResults[item.id] || [];
+        if (itemResults.length === 0) return false;
+        
+        const correct = itemResults.filter(r => r.isCorrect).length;
+        const accuracy = (correct / itemResults.length) * 100;
+        return accuracy < 70;
+      });
+      
+      document.getElementById('reviewCount').textContent = reviewItems.length;
+      
+      if (reviewItems.length === 0) {
+        document.getElementById('reviewList').innerHTML = `
+          <div class="text-center text-muted">
+            <p>暂无需要复习的策略</p>
+          </div>
+        `;
+        return;
+      }
+      
+      document.getElementById('reviewList').innerHTML = reviewItems.map(item => `
+        <div class="mastered-item" onclick="goToDetail(${item.id})">
+          <span class="mastered-icon" style="color: #f59e0b;">⚠</span>
+          <span class="mastered-text">${item.root}</span>
+        </div>
+      `).join('');
+    }
+
+    // 跳转到详情页
+    window.goToDetail = function(id) {
+      window.location.href = `root-detail.html?id=${id}`;
+    };
+
+    // 导出进度数据
+    window.exportProgress = function() {
+      try {
+        const data = exportData();
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `rag-workshop-progress-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        alert('学习数据已导出！');
+      } catch (error) {
+        alert('导出失败：' + error.message);
+      }
+    };
+
+    // 导入进度数据
+    window.importProgress = function() {
+      document.getElementById('importFile').click();
+    };
+
+    // 处理文件导入
+    window.handleImport = function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const success = importData(e.target.result);
+          if (success) {
+            alert('学习数据导入成功！页面将刷新。');
+            window.location.reload();
+          } else {
+            alert('导入失败：数据格式不正确');
+          }
+        } catch (error) {
+          alert('导入失败：' + error.message);
+        }
+      };
+      reader.readAsText(file);
+    };
+
+    // 清除进度数据
+    window.clearProgress = function() {
+      clearAllData();
+    };
+
+    // 初始化页面
+    function initializePage() {
+      renderOverviewStats();
+      renderRecommendations();
+      renderCategoryStats();
+      renderMasteredItems();
+      renderReviewItems();
+    }
+
+    // 监听掌握状态变化
+    window.addEventListener('masteredChanged', () => {
+      initializePage();
+    });
+
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', initializePage);
+  </script>
+
+  <!-- 存储模块 -->
+  <script src="js/storage.js"></script>
+</body>
+</html>

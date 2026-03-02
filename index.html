@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAG优化策略工坊</title>
+
+  <!-- SEO 基础 -->
+  <meta name="description" content="基于最新RAG技术发展，涵盖查询优化、分块策略、索引技术、检索方法、生成优化、数据优化六大核心领域。从多查询重写到语义缓存，从HyDE到GraphRAG，掌握构建高性能RAG系统的完整技术栈。">
+  <meta name="keywords" content="RAG优化策略,学习,知识,策略">
+  <meta name="author" content="乔木">
+  <meta name="language" content="zh-CN">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://rag-optimization-workshop.vercel.app/">
+
+  <!-- Open Graph (社交分享) -->
+  <meta property="og:title" content="RAG优化策略工坊">
+  <meta property="og:description" content="基于最新RAG技术发展，涵盖查询优化、分块策略、索引技术、检索方法、生成优化、数据优化六大核心领域。从多查询重写到语义缓存，从HyDE到GraphRAG，掌握构建高性能RAG系统的完整技术栈。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rag-optimization-workshop.vercel.app/">
+  <meta property="og:image" content="https://rag-optimization-workshop.vercel.app/icon-512.png">
+  <meta property="og:site_name" content="RAG优化策略工坊">
+  <meta property="og:locale" content="zh_CN">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@vista8">
+  <meta name="twitter:creator" content="@vista8">
+  <meta name="twitter:title" content="RAG优化策略工坊">
+  <meta name="twitter:description" content="基于最新RAG技术发展，涵盖查询优化、分块策略、索引技术、检索方法、生成优化、数据优化六大核心领域。从多查询重写到语义缓存，从HyDE到GraphRAG，掌握构建高性能RAG系统的完整技术栈。">
+  <meta name="twitter:image" content="https://rag-optimization-workshop.vercel.app/icon-512.png">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>">
+
+  <!-- PWA 支持 -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#FBBF24">
+
+  <!-- iOS Safari PWA 支持 -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="策略学习">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- 样式 -->
+  <link rel="stylesheet" href="css/minimal.css">
+</head>
+<body>
+  <!-- 导航栏 -->
+  <nav class="nav">
+    <div class="container">
+      <div class="nav-content">
+        <a href="index.html" class="nav-brand">RAG优化策略工坊</a>
+        <ul class="nav-links">
+          <li><a href="learn.html" class="nav-link">学习</a></li>
+          <li><a href="flashcard.html" class="nav-link">闪卡</a></li>
+          <li><a href="roots.html" class="nav-link">索引</a></li>
+          <li><a href="progress.html" class="nav-link">进度</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero区 -->
+  <section class="hero">
+    <div class="container">
+      <h1 class="hero-title">
+        <div>40个核心策略</div>
+        <div>掌握RAG优化</div>
+        <div>的完整体系</div>
+      </h1>
+      <p class="hero-subtitle">从查询重写到多模态检索，系统学习检索增强生成的优化技术</p>
+      <div class="hero-cta">
+        <a href="learn.html" class="btn btn-primary">开始第一个策略 →</a>
+        <a href="flashcard.html" class="btn btn-secondary">闪卡复习</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 统计卡片 -->
+  <section class="container">
+    <div class="stats-grid">
+      <div class="card stat-card">
+        <div class="stat-value">40</div>
+        <div class="stat-label">优化策略</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-value">8大</div>
+        <div class="stat-label">技术维度</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-value">20分钟</div>
+        <div class="stat-label">每日精进</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 动画演示区 -->
+  <section class="demo-section">
+    <div class="container">
+      <h2 class="demo-title">核心策略预览</h2>
+      <div class="demo-cards" id="demoCards">
+        <!-- 动态加载前5个策略 -->
+      </div>
+    </div>
+  </section>
+
+  <!-- 底部介绍 -->
+  <footer class="spacing-3xl">
+    <div class="container-narrow text-center">
+      <h2 class="text-3xl font-semibold spacing-lg">让AI检索更精准，生成更可靠</h2>
+      <p class="text-lg text-muted spacing-lg">
+        基于最新RAG技术发展，涵盖查询优化、分块策略、索引技术、检索方法、生成优化、数据优化六大核心领域。从多查询重写到语义缓存，从HyDE到GraphRAG，掌握构建高性能RAG系统的完整技术栈。
+      </p>
+      <div class="spacing-lg">
+        <a href="learn.html" class="btn btn-primary">开始学习</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script type="module">
+    import { WordRoots } from './js/wordData.js';
+    import { siteConfig } from './js/siteConfig.js';
+
+    // 动态加载演示卡片
+    function loadDemoCards() {
+      const demoContainer = document.getElementById('demoCards');
+      if (!demoContainer) return;
+
+      const demoCount = siteConfig.hero.animation.demoCount || 5;
+      const demoItems = WordRoots.slice(0, demoCount);
+
+      demoContainer.innerHTML = demoItems.map(item => `
+        <div class="card demo-card card-interactive" onclick="window.location.href='root-detail.html?id=${item.id}'">
+          <div class="demo-card-header">
+            <h3 class="demo-card-title">${item.root}</h3>
+            <span class="demo-card-category">${item.origin}</span>
+          </div>
+          <p class="demo-card-description">${item.meaning}</p>
+        </div>
+      `).join('');
+    }
+
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', loadDemoCards);
+
+    // 注册 Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(registration => {
+            console.log('SW registered: ', registration);
+          })
+          .catch(registrationError => {
+            console.log('SW registration failed: ', registrationError);
+          });
+      });
+    }
+  </script>
+</body>
+</html>

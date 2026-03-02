@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>学习模式 - RAG优化策略工坊</title>
+
+  <!-- SEO 基础 -->
+  <meta name="description" content="渐进式学习RAG优化策略，从查询优化到数据优化，系统掌握40个核心技术。">
+  <meta name="keywords" content="RAG优化策略,学习,知识,策略,渐进式学习">
+  <meta name="author" content="乔木">
+  <meta name="language" content="zh-CN">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://rag-optimization-workshop.vercel.app/learn.html">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="学习模式 - RAG优化策略工坊">
+  <meta property="og:description" content="渐进式学习RAG优化策略，从查询优化到数据优化，系统掌握40个核心技术。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rag-optimization-workshop.vercel.app/learn.html">
+  <meta property="og:image" content="https://rag-optimization-workshop.vercel.app/icon-512.png">
+
+  <!-- PWA 支持 -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#FBBF24">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+
+  <!-- 字体和样式 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/minimal.css">
+</head>
+<body>
+  <!-- 导航栏 -->
+  <nav class="nav">
+    <div class="container">
+      <div class="nav-content">
+        <a href="index.html" class="nav-brand">RAG优化策略工坊</a>
+        <ul class="nav-links">
+          <li><a href="learn.html" class="nav-link active">学习</a></li>
+          <li><a href="flashcard.html" class="nav-link">闪卡</a></li>
+          <li><a href="roots.html" class="nav-link">索引</a></li>
+          <li><a href="progress.html" class="nav-link">进度</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 学习内容 -->
+  <div class="learn-container">
+    <div class="learn-header">
+      <h1 class="text-4xl font-bold">渐进式学习</h1>
+      <p class="text-lg text-muted">系统掌握RAG优化策略</p>
+    </div>
+
+    <!-- 进度条 -->
+    <div class="learn-progress">
+      <div class="learn-progress-bar" id="progressBar"></div>
+    </div>
+    <div class="text-center text-sm text-muted" id="progressText">策略 1 / 40</div>
+
+    <!-- 学习卡片 -->
+    <div class="card learn-card" id="learnCard">
+      <!-- 动态加载内容 -->
+    </div>
+
+    <!-- 导航控制 -->
+    <div class="learn-navigation">
+      <button class="btn btn-secondary" id="prevBtn" onclick="previousItem()">← 上一个</button>
+      
+      <div class="learn-mastered">
+        <label>
+          <input type="checkbox" class="mastered-checkbox" id="masteredCheckbox" onchange="toggleMastered()">
+          已掌握此策略
+        </label>
+      </div>
+      
+      <button class="btn btn-primary" id="nextBtn" onclick="nextItem()">下一个 →</button>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script type="module">
+    import { WordRoots } from './js/wordData.js';
+    import { loadProgress, saveMastered, isMastered } from './js/storage.js';
+
+    let currentIndex = 0;
+    const totalItems = WordRoots.length;
+
+    // 从URL参数获取起始位置
+    function getStartIndex() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id');
+      if (id) {
+        const index = WordRoots.findIndex(item => item.id == id);
+        return index >= 0 ? index : 0;
+      }
+      return 0;
+    }
+
+    // 渲染当前学习项
+    function renderCurrentItem() {
+      const item = WordRoots[currentIndex];
+      const learnCard = document.getElementById('learnCard');
+      
+      learnCard.innerHTML = `
+        <div class="learn-card-header">
+          <div class="learn-category">${item.origin}</div>
+          <h2 class="learn-title">${item.root}</h2>
+          <p class="learn-meaning">${item.meaning}</p>
+        </div>
+        
+        <div class="learn-description">${item.description}</div>
+        
+        <div class="learn-examples">
+          <h3 class="learn-examples-title">应用实例</h3>
+          ${item.examples.map(example => `
+            <div class="example-item">
+              <div class="example-word">${example.word}</div>
+              <div class="example-meaning">${example.meaning}</div>
+              <div class="example-explanation">${example.explanation}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      // 更新进度
+      updateProgress();
+      
+      // 更新掌握状态
+      updateMasteredStatus();
+      
+      // 更新导航按钮状态
+      updateNavigationButtons();
+    }
+
+    // 更新进度显示
+    function updateProgress() {
+      const progress = ((currentIndex + 1) / totalItems) * 100;
+      document.getElementById('progressBar').style.width = `${progress}%`;
+      document.getElementById('progressText').textContent = `策略 ${currentIndex + 1} / ${totalItems}`;
+    }
+
+    // 更新掌握状态
+    function updateMasteredStatus() {
+      const item = WordRoots[currentIndex];
+      const checkbox = document.getElementById('masteredCheckbox');
+      checkbox.checked = isMastered(item.id);
+    }
+
+    // 更新导航按钮
+    function updateNavigationButtons() {
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      
+      prevBtn.disabled = currentIndex === 0;
+      prevBtn.style.opacity = currentIndex === 0 ? '0.5' : '1';
+      
+      if (currentIndex === totalItems - 1) {
+        nextBtn.textContent = '完成学习 ✓';
+        nextBtn.onclick = () => {
+          alert('恭喜！您已完成所有策略的学习！');
+          window.location.href = 'progress.html';
+        };
+      } else {
+        nextBtn.textContent = '下一个 →';
+        nextBtn.onclick = nextItem;
+      }
+    }
+
+    // 上一个项目
+    window.previousItem = function() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderCurrentItem();
+      }
+    };
+
+    // 下一个项目
+    window.nextItem = function() {
+      if (currentIndex < totalItems - 1) {
+        currentIndex++;
+        renderCurrentItem();
+      }
+    };
+
+    // 切换掌握状态
+    window.toggleMastered = function() {
+      const item = WordRoots[currentIndex];
+      const checkbox = document.getElementById('masteredCheckbox');
+      saveMastered(item.id, checkbox.checked);
+    };
+
+    // 键盘导航
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft' && currentIndex > 0) {
+        previousItem();
+      } else if (e.key === 'ArrowRight' && currentIndex < totalItems - 1) {
+        nextItem();
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        const checkbox = document.getElementById('masteredCheckbox');
+        checkbox.checked = !checkbox.checked;
+        toggleMastered();
+      }
+    });
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      currentIndex = getStartIndex();
+      renderCurrentItem();
+    });
+  </script>
+
+  <!-- 存储模块 -->
+  <script src="js/storage.js"></script>
+</body>
+</html>

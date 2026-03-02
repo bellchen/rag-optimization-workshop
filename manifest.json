@@ -1,0 +1,57 @@
+{
+  "name": "RAG优化策略工坊",
+  "short_name": "RAG策略",
+  "description": "学习RAG优化策略的完整工坊，掌握40个核心技术",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fafafa",
+  "theme_color": "#FBBF24",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "zh-CN",
+  "categories": ["education", "productivity", "reference"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "开始学习",
+      "short_name": "学习",
+      "description": "进入渐进式学习模式",
+      "url": "/learn.html",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "闪卡复习",
+      "short_name": "闪卡",
+      "description": "使用闪卡快速复习",
+      "url": "/flashcard.html",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "策略索引",
+      "short_name": "索引",
+      "description": "浏览所有策略",
+      "url": "/roots.html",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "学习进度",
+      "short_name": "进度",
+      "description": "查看学习统计",
+      "url": "/progress.html",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

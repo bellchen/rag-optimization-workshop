@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">策略详情 - RAG优化策略工坊</title>
+
+  <!-- SEO 基础 -->
+  <meta name="description" content="深入了解RAG优化策略的详细说明、应用实例和测试题目。" id="pageDescription">
+  <meta name="keywords" content="RAG优化策略,详情,应用实例,测试">
+  <meta name="author" content="乔木">
+  <meta name="language" content="zh-CN">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://rag-optimization-workshop.vercel.app/root-detail.html" id="canonicalUrl">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="策略详情 - RAG优化策略工坊" id="ogTitle">
+  <meta property="og:description" content="深入了解RAG优化策略的详细说明、应用实例和测试题目。" id="ogDescription">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rag-optimization-workshop.vercel.app/root-detail.html" id="ogUrl">
+  <meta property="og:image" content="https://rag-optimization-workshop.vercel.app/icon-512.png">
+
+  <!-- PWA 支持 -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#FBBF24">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+
+  <!-- 字体和样式 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/minimal.css">
+</head>
+<body>
+  <!-- 导航栏 -->
+  <nav class="nav">
+    <div class="container">
+      <div class="nav-content">
+        <a href="index.html" class="nav-brand">RAG优化策略工坊</a>
+        <ul class="nav-links">
+          <li><a href="learn.html" class="nav-link">学习</a></li>
+          <li><a href="flashcard.html" class="nav-link">闪卡</a></li>
+          <li><a href="roots.html" class="nav-link">索引</a></li>
+          <li><a href="progress.html" class="nav-link">进度</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主要内容 -->
+  <div class="detail-container">
+    <!-- 返回按钮 -->
+    <div class="spacing-md">
+      <button class="btn btn-ghost" onclick="goBack()">← 返回</button>
+    </div>
+
+    <!-- 策略详情 -->
+    <div id="detailContent">
+      <!-- 动态加载内容 -->
+    </div>
+
+    <!-- 相关策略推荐 -->
+    <div class="spacing-2xl" id="relatedSection">
+      <h3 class="text-2xl font-semibold spacing-lg">相关策略</h3>
+      <div class="items-grid" id="relatedItems">
+        <!-- 动态加载相关内容 -->
+      </div>
+    </div>
+
+    <!-- 导航到其他页面 -->
+    <div class="text-center spacing-2xl">
+      <div class="spacing-lg">
+        <a href="learn.html" class="btn btn-primary">进入学习模式</a>
+        <a href="flashcard.html" class="btn btn-secondary">闪卡复习</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script type="module">
+    import { WordRoots } from './js/wordData.js';
+    import { saveMastered, isMastered, saveQuizResult, markItemVisited } from './js/storage.js';
+
+    let currentItem = null;
+    let quizAnswered = false;
+
+    // 从URL获取策略ID
+    function getItemId() {
+      const urlParams = new URLSearchParams(window.location.search);
+      return parseInt(urlParams.get('id'));
+    }
+
+    // 返回上一页
+    window.goBack = function() {
+      if (document.referrer && document.referrer.includes(window.location.host)) {
+        history.back();
+      } else {
+        window.location.href = 'roots.html';
+      }
+    };
+
+    // 渲染策略详情
+    function renderDetail(item) {
+      if (!item) {
+        document.getElementById('detailContent').innerHTML = `
+          <div class="text-center spacing-xl">
+            <h2>策略未找到</h2>
+            <p class="text-muted">请检查URL或返回策略索引</p>
+            <a href="roots.html" class="btn btn-primary">返回索引</a>
+          </div>
+        `;
+        return;
+      }
+
+      currentItem = item;
+      
+      // 更新页面标题和SEO信息
+      updatePageMeta(item);
+      
+      // 标记为已访问
+      markItemVisited(item.id);
+      
+      const mastered = isMastered(item.id);
+      
+      document.getElementById('detailContent').innerHTML = `
+        <div class="detail-header">
+          <div class="detail-category">${item.origin}</div>
+          <h1 class="detail-title">${item.root}</h1>
+          <div class="detail-meaning">${item.meaning}</div>
+        </div>
+        
+        <div class="detail-description">${item.description}</div>
+        
+        <div class="detail-examples">
+          <h3 class="detail-examples-title">应用实例</h3>
+          ${item.examples.map(example => `
+            <div class="example-item">
+              <div class="example-word">${example.word}</div>
+              <div class="example-meaning">${example.meaning}</div>
+              <div class="example-explanation">${example.explanation}</div>
+            </div>
+          `).join('')}
+        </div>
+        
+        ${item.quiz ? renderQuiz(item.quiz) : ''}
+        
+        <div class="text-center spacing-lg">
+          <button class="btn ${mastered ? 'btn-primary' : 'btn-secondary'}" onclick="toggleMastered()">
+            ${mastered ? '★ 已掌握' : '☆ 标记掌握'}
+          </button>
+        </div>
+      `;
+    }
+
+    // 渲染测试题
+    function renderQuiz(quiz) {
+      return `
+        <div class="detail-quiz">
+          <h3 class="quiz-title">知识测试</h3>
+          <div class="quiz-question">${quiz.question}</div>
+          <div class="quiz-options" id="quizOptions">
+            ${quiz.options.map((option, index) => `
+              <div class="quiz-option" onclick="selectOption(${index})" data-index="${index}">
+                ${String.fromCharCode(65 + index)}. ${option}
+              </div>
+            `).join('')}
+          </div>
+          <div class="quiz-result hidden" id="quizResult"></div>
+        </div>
+      `;
+    }
+
+    // 选择测试选项
+    window.selectOption = function(selectedIndex) {
+      if (quizAnswered) return;
+      
+      const options = document.querySelectorAll('.quiz-option');
+      const result = document.getElementById('quizResult');
+      const correctIndex = currentItem.quiz.correctAnswer;
+      
+      // 标记选中的选项
+      options[selectedIndex].classList.add('selected');
+      
+      // 显示正确答案
+      setTimeout(() => {
+        options[correctIndex].classList.add('correct');
+        if (selectedIndex !== correctIndex) {
+          options[selectedIndex].classList.add('incorrect');
+        }
+        
+        // 显示结果
+        const isCorrect = selectedIndex === correctIndex;
+        result.className = `quiz-result ${isCorrect ? 'correct' : 'incorrect'}`;
+        result.textContent = isCorrect ? 
+          '✓ 回答正确！' : 
+          `✗ 回答错误。正确答案是 ${String.fromCharCode(65 + correctIndex)}`;
+        
+        // 保存测试结果
+        saveQuizResult(currentItem.id, isCorrect, selectedIndex, correctIndex);
+        
+        quizAnswered = true;
+      }, 300);
+    };
+
+    // 切换掌握状态
+    window.toggleMastered = function() {
+      if (!currentItem) return;
+      
+      const mastered = isMastered(currentItem.id);
+      saveMastered(currentItem.id, !mastered);
+      
+      // 重新渲染以更新按钮状态
+      renderDetail(currentItem);
+    };
+
+    // 更新页面元信息
+    function updatePageMeta(item) {
+      const title = `${item.root} - RAG优化策略工坊`;
+      const description = `${item.meaning}。${item.description.substring(0, 150)}...`;
+      const url = `https://rag-optimization-workshop.vercel.app/root-detail.html?id=${item.id}`;
+      
+      document.title = title;
+      document.getElementById('pageTitle').content = title;
+      document.getElementById('pageDescription').content = description;
+      document.getElementById('canonicalUrl').href = url;
+      document.getElementById('ogTitle').content = title;
+      document.getElementById('ogDescription').content = description;
+      document.getElementById('ogUrl').content = url;
+    }
+
+    // 渲染相关策略
+    function renderRelatedItems(currentItem) {
+      if (!currentItem) return;
+      
+      // 找到同类别的其他策略
+      const relatedItems = WordRoots
+        .filter(item => item.id !== currentItem.id && item.origin === currentItem.origin)
+        .slice(0, 3);
+      
+      if (relatedItems.length === 0) {
+        document.getElementById('relatedSection').style.display = 'none';
+        return;
+      }
+      
+      document.getElementById('relatedItems').innerHTML = relatedItems.map(item => {
+        const mastered = isMastered(item.id);
+        const masteredIcon = mastered ? '★' : '';
+        
+        return `
+          <div class="card item-card" onclick="goToItem(${item.id})">
+            <div class="item-header">
+              <h3 class="item-title">
+                ${masteredIcon} ${item.root}
+              </h3>
+              <span class="item-category">${item.origin}</span>
+            </div>
+            <p class="item-meaning">${item.meaning}</p>
+            <p class="item-description">${item.description}</p>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 跳转到其他策略
+    window.goToItem = function(id) {
+      window.location.href = `root-detail.html?id=${id}`;
+    };
+
+    // 键盘导航
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        return;
+      }
+      
+      switch (e.key) {
+        case 'Escape':
+          goBack();
+          break;
+        case 'm':
+        case 'M':
+          e.preventDefault();
+          toggleMastered();
+          break;
+        case 'ArrowLeft':
+          // 上一个策略
+          if (currentItem && currentItem.id > 1) {
+            window.location.href = `root-detail.html?id=${currentItem.id - 1}`;
+          }
+          break;
+        case 'ArrowRight':
+          // 下一个策略
+          if (currentItem && currentItem.id < WordRoots.length) {
+            window.location.href = `root-detail.html?id=${currentItem.id + 1}`;
+          }
+          break;
+      }
+    });
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      const itemId = getItemId();
+      const item = WordRoots.find(item => item.id === itemId);
+      
+      renderDetail(item);
+      renderRelatedItems(item);
+    });
+  </script>
+
+  <!-- 存储模块 -->
+  <script src="js/storage.js"></script>
+</body>
+</html>

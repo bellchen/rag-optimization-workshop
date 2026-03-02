@@ -1,0 +1,27 @@
+User-agent: *
+Allow: /
+
+# 主要页面
+Allow: /index.html
+Allow: /learn.html
+Allow: /flashcard.html
+Allow: /roots.html
+Allow: /root-detail.html
+Allow: /progress.html
+
+# 静态资源
+Allow: /css/
+Allow: /js/
+Allow: /icon-*.png
+Allow: /manifest.json
+
+# 禁止访问的文件
+Disallow: /sw.js
+Disallow: /*.json$
+Disallow: /.*
+
+# 网站地图
+Sitemap: https://rag-optimization-workshop.vercel.app/sitemap.xml
+
+# 爬取延迟（毫秒）
+Crawl-delay: 1

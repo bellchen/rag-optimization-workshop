@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>闪卡复习 - RAG优化策略工坊</title>
+
+  <!-- SEO 基础 -->
+  <meta name="description" content="通过闪卡模式快速复习RAG优化策略，支持键盘操作，高效记忆核心概念。">
+  <meta name="keywords" content="RAG优化策略,闪卡,复习,记忆,快速学习">
+  <meta name="author" content="乔木">
+  <meta name="language" content="zh-CN">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://rag-optimization-workshop.vercel.app/flashcard.html">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="闪卡复习 - RAG优化策略工坊">
+  <meta property="og:description" content="通过闪卡模式快速复习RAG优化策略，支持键盘操作，高效记忆核心概念。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rag-optimization-workshop.vercel.app/flashcard.html">
+  <meta property="og:image" content="https://rag-optimization-workshop.vercel.app/icon-512.png">
+
+  <!-- PWA 支持 -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#FBBF24">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+
+  <!-- 字体和样式 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/minimal.css">
+</head>
+<body>
+  <!-- 导航栏 -->
+  <nav class="nav">
+    <div class="container">
+      <div class="nav-content">
+        <a href="index.html" class="nav-brand">RAG优化策略工坊</a>
+        <ul class="nav-links">
+          <li><a href="learn.html" class="nav-link">学习</a></li>
+          <li><a href="flashcard.html" class="nav-link active">闪卡</a></li>
+          <li><a href="roots.html" class="nav-link">索引</a></li>
+          <li><a href="progress.html" class="nav-link">进度</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 闪卡内容 -->
+  <div class="flashcard-container">
+    <div class="text-center spacing-md">
+      <h1 class="text-4xl font-bold">闪卡复习</h1>
+      <p class="text-lg text-muted">快速复习RAG优化策略</p>
+    </div>
+
+    <!-- 进度显示 -->
+    <div class="text-center text-sm text-muted" id="progressText">策略 1 / 40</div>
+
+    <!-- 闪卡 -->
+    <div class="flashcard" id="flashcard" onclick="flipCard()">
+      <div class="flashcard-inner" id="flashcardInner">
+        <!-- 正面 -->
+        <div class="flashcard-front">
+          <div class="flashcard-category" id="frontCategory">查询优化</div>
+          <h2 class="flashcard-title" id="frontTitle">多查询重写</h2>
+          <p class="flashcard-meaning" id="frontMeaning">点击翻转查看详细说明</p>
+        </div>
+        
+        <!-- 背面 -->
+        <div class="flashcard-back">
+          <div class="flashcard-description" id="backDescription">
+            <!-- 动态加载内容 -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 控制按钮 -->
+    <div class="flashcard-controls">
+      <button class="btn btn-secondary" id="prevBtn" onclick="previousCard()">← 上一张</button>
+      
+      <div class="text-center">
+        <button class="btn btn-ghost" onclick="shuffleCards()" title="随机顺序">🔀 随机</button>
+        <button class="btn btn-ghost" onclick="toggleMastered()" id="masteredBtn" title="标记掌握">⭐</button>
+      </div>
+      
+      <button class="btn btn-primary" id="nextBtn" onclick="nextCard()">下一张 →</button>
+    </div>
+
+    <!-- 键盘提示 -->
+    <div class="flashcard-hint">
+      <p>💡 键盘操作：← → 切换卡片，空格键翻转，M 标记掌握</p>
+    </div>
+
+    <!-- 筛选选项 -->
+    <div class="text-center spacing-lg">
+      <div class="filter-buttons">
+        <button class="filter-btn active" onclick="filterCards('all')">全部策略</button>
+        <button class="filter-btn" onclick="filterCards('unmastered')">未掌握</button>
+        <button class="filter-btn" onclick="filterCards('mastered')">已掌握</button>
+        <button class="filter-btn" onclick="filterCards('random')">随机10张</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script type="module">
+    import { WordRoots } from './js/wordData.js';
+    import { saveMastered, isMastered, loadMasteredItems } from './js/storage.js';
+
+    let currentCards = [...WordRoots];
+    let currentIndex = 0;
+    let isFlipped = false;
+
+    // 渲染当前卡片
+    function renderCard() {
+      if (currentCards.length === 0) {
+        document.getElementById('flashcard').innerHTML = `
+          <div class="text-center spacing-xl">
+            <h3>没有符合条件的策略</h3>
+            <p class="text-muted">请选择其他筛选条件</p>
+          </div>
+        `;
+        return;
+      }
+
+      const item = currentCards[currentIndex];
+      
+      // 更新正面
+      document.getElementById('frontCategory').textContent = item.origin;
+      document.getElementById('frontTitle').textContent = item.root;
+      document.getElementById('frontMeaning').textContent = item.meaning;
+      
+      // 更新背面
+      document.getElementById('backDescription').innerHTML = `
+        <h3 style="margin-bottom: 16px; font-size: 20px; font-weight: 600;">${item.root}</h3>
+        <p style="margin-bottom: 20px; font-style: italic; color: #6b7280;">${item.meaning}</p>
+        <div style="text-align: left; line-height: 1.6;">
+          ${item.description}
+        </div>
+      `;
+      
+      // 重置翻转状态
+      resetFlip();
+      
+      // 更新进度
+      updateProgress();
+      
+      // 更新掌握按钮状态
+      updateMasteredButton();
+      
+      // 更新导航按钮
+      updateNavigationButtons();
+    }
+
+    // 翻转卡片
+    window.flipCard = function() {
+      const flashcard = document.getElementById('flashcard');
+      isFlipped = !isFlipped;
+      
+      if (isFlipped) {
+        flashcard.classList.add('flipped');
+      } else {
+        flashcard.classList.remove('flipped');
+      }
+    };
+
+    // 重置翻转状态
+    function resetFlip() {
+      const flashcard = document.getElementById('flashcard');
+      flashcard.classList.remove('flipped');
+      isFlipped = false;
+    }
+
+    // 上一张卡片
+    window.previousCard = function() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderCard();
+      }
+    };
+
+    // 下一张卡片
+    window.nextCard = function() {
+      if (currentIndex < currentCards.length - 1) {
+        currentIndex++;
+        renderCard();
+      }
+    };
+
+    // 更新进度显示
+    function updateProgress() {
+      const progressText = document.getElementById('progressText');
+      if (currentCards.length > 0) {
+        progressText.textContent = `策略 ${currentIndex + 1} / ${currentCards.length}`;
+      } else {
+        progressText.textContent = '无策略';
+      }
+    }
+
+    // 更新掌握按钮
+    function updateMasteredButton() {
+      if (currentCards.length === 0) return;
+      
+      const item = currentCards[currentIndex];
+      const masteredBtn = document.getElementById('masteredBtn');
+      const mastered = isMastered(item.id);
+      
+      masteredBtn.textContent = mastered ? '★ 已掌握' : '☆ 标记掌握';
+      masteredBtn.style.color = mastered ? '#FBBF24' : '#6b7280';
+    }
+
+    // 更新导航按钮
+    function updateNavigationButtons() {
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      
+      prevBtn.disabled = currentIndex === 0;
+      prevBtn.style.opacity = currentIndex === 0 ? '0.5' : '1';
+      
+      nextBtn.disabled = currentIndex === currentCards.length - 1;
+      nextBtn.style.opacity = currentIndex === currentCards.length - 1 ? '0.5' : '1';
+    }
+
+    // 切换掌握状态
+    window.toggleMastered = function() {
+      if (currentCards.length === 0) return;
+      
+      const item = currentCards[currentIndex];
+      const mastered = isMastered(item.id);
+      saveMastered(item.id, !mastered);
+      updateMasteredButton();
+    };
+
+    // 随机打乱卡片
+    window.shuffleCards = function() {
+      for (let i = currentCards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [currentCards[i], currentCards[j]] = [currentCards[j], currentCards[i]];
+      }
+      currentIndex = 0;
+      renderCard();
+    };
+
+    // 筛选卡片
+    window.filterCards = function(type) {
+      // 更新筛选按钮状态
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+      
+      const masteredItems = loadMasteredItems();
+      
+      switch (type) {
+        case 'all':
+          currentCards = [...WordRoots];
+          break;
+        case 'mastered':
+          currentCards = WordRoots.filter(item => masteredItems.includes(item.id));
+          break;
+        case 'unmastered':
+          currentCards = WordRoots.filter(item => !masteredItems.includes(item.id));
+          break;
+        case 'random':
+          const shuffled = [...WordRoots].sort(() => Math.random() - 0.5);
+          currentCards = shuffled.slice(0, 10);
+          break;
+      }
+      
+      currentIndex = 0;
+      renderCard();
+    };
+
+    // 键盘事件
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        return; // 在输入框中不响应快捷键
+      }
+      
+      switch (e.key) {
+        case 'ArrowLeft':
+          e.preventDefault();
+          if (currentIndex > 0) previousCard();
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          if (currentIndex < currentCards.length - 1) nextCard();
+          break;
+        case ' ':
+          e.preventDefault();
+          flipCard();
+          break;
+        case 'm':
+        case 'M':
+          e.preventDefault();
+          toggleMastered();
+          break;
+      }
+    });
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCard();
+    });
+
+    // 监听掌握状态变化
+    window.addEventListener('masteredChanged', () => {
+      updateMasteredButton();
+    });
+  </script>
+
+  <!-- 存储模块 -->
+  <script src="js/storage.js"></script>
+</body>
+</html>
