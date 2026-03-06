@@ -1019,6 +1019,7 @@ body {
 .text-center { text-align: center; }
 .text-left { text-align: left; }
 .text-right { text-align: right; }
+.text-muted { color: var(--color-text-muted); }
 
 .hidden { display: none; }
 .visible { display: block; }
