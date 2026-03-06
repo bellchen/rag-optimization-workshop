@@ -192,9 +192,16 @@
         // 显示结果
         const isCorrect = selectedIndex === correctIndex;
         result.className = `quiz-result ${isCorrect ? 'correct' : 'incorrect'}`;
-        result.textContent = isCorrect ? 
-          '✓ 回答正确！' : 
-          `✗ 回答错误。正确答案是 ${String.fromCharCode(65 + correctIndex)}`;
+        
+        if (isCorrect && !isMastered(currentItem.id)) {
+          saveMastered(currentItem.id, true);
+          result.textContent = '✓ 回答正确！已自动标记为已掌握';
+          renderDetail(currentItem);
+        } else {
+          result.textContent = isCorrect ? 
+            '✓ 回答正确！' : 
+            `✗ 回答错误。正确答案是 ${String.fromCharCode(65 + correctIndex)}`;
+        }
         
         // 保存测试结果
         saveQuizResult(currentItem.id, isCorrect, selectedIndex, correctIndex);
