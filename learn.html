@@ -30,7 +30,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/minimal.css?v=3">
+  <link rel="stylesheet" href="css/minimal.css?v=4">
 </head>
 <body>
   <!-- 导航栏 -->
@@ -84,7 +84,7 @@
   <!-- JavaScript -->
   <script type="module">
     import { WordRoots } from './js/wordData.js?v=2';
-    import { loadProgress, saveMastered, isMastered } from './js/storage.js?v=2';
+    import { loadProgress, saveMastered, isMastered, saveQuizResult } from './js/storage.js?v=2';
 
     let currentIndex = 0;
     const totalItems = WordRoots.length;
@@ -124,7 +124,21 @@
             </div>
           `).join('')}
         </div>
+
+        ${item.quiz ? `
+        <div class="learn-quiz">
+          <h3 class="quiz-title">知识测验</h3>
+          <div class="quiz-question">${item.quiz.question}</div>
+          <div class="quiz-options" id="quizOptions"></div>
+          <div class="quiz-result" id="quizResult" style="display:none;"></div>
+        </div>
+        ` : ''}
       `;
+
+      // 渲染测验选项
+      if (item.quiz) {
+        renderQuizOptions(item.quiz);
+      }
 
       // 更新进度
       updateProgress();
@@ -134,6 +148,54 @@
       
       // 更新导航按钮状态
       updateNavigationButtons();
+    }
+
+    // 渲染测验选项
+    let quizAnswered = false;
+    function renderQuizOptions(quiz) {
+      quizAnswered = false;
+      const container = document.getElementById('quizOptions');
+      if (!container) return;
+      container.innerHTML = '';
+      quiz.options.forEach((option, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-option';
+        btn.textContent = option;
+        btn.onclick = () => checkQuizAnswer(idx);
+        container.appendChild(btn);
+      });
+      const result = document.getElementById('quizResult');
+      if (result) { result.style.display = 'none'; result.className = 'quiz-result'; }
+    }
+
+    function checkQuizAnswer(selectedIndex) {
+      if (quizAnswered) return;
+      quizAnswered = true;
+      const item = WordRoots[currentIndex];
+      const quiz = item.quiz;
+      const correctIndex = quiz.correctAnswer;
+      const isCorrect = selectedIndex === correctIndex;
+
+      const options = document.querySelectorAll('#quizOptions .quiz-option');
+      options.forEach((btn, idx) => {
+        btn.style.pointerEvents = 'none';
+        if (idx === correctIndex) btn.classList.add('correct');
+        else if (idx === selectedIndex && !isCorrect) btn.classList.add('incorrect');
+      });
+
+      const result = document.getElementById('quizResult');
+      if (result) {
+        result.style.display = 'block';
+        if (isCorrect) {
+          result.className = 'quiz-result correct';
+          result.textContent = '✓ 回答正确！';
+        } else {
+          result.className = 'quiz-result incorrect';
+          result.textContent = '✗ 回答错误，正确答案是：' + quiz.options[correctIndex];
+        }
+      }
+
+      saveQuizResult(item.id, isCorrect, selectedIndex, correctIndex);
     }
 
     // 更新进度显示
