@@ -30,7 +30,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/minimal.css">
+  <link rel="stylesheet" href="css/minimal.css?v=2">
 </head>
 <body>
   <!-- 导航栏 -->
@@ -114,7 +114,7 @@
 
   <!-- JavaScript -->
   <script type="module">
-    import { WordRoots } from './js/wordData.js';
+    import { WordRoots } from './js/wordData.js?v=2';
     import { 
       getOverallStats, 
       loadMasteredItems, 
@@ -123,7 +123,7 @@
       exportData,
       importData,
       clearAllData
-    } from './js/storage.js';
+    } from './js/storage.js?v=2';
 
     // 渲染总体统计
     function renderOverviewStats() {
@@ -341,7 +341,5 @@
     document.addEventListener('DOMContentLoaded', initializePage);
   </script>
 
-  <!-- 存储模块 -->
-  <script src="js/storage.js"></script>
 </body>
 </html>
