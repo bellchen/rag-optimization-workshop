@@ -330,36 +330,6 @@ function getStudyRecommendations() {
   return recommendations;
 }
 
-// 如果在浏览器环境中，将函数挂载到全局对象
-if (typeof window !== 'undefined') {
-  // 核心功能
-  window.loadMasteredItems = loadMasteredItems;
-  window.saveMastered = saveMastered;
-  window.isMastered = isMastered;
-  window.getMasteredCount = getMasteredCount;
-  
-  window.loadProgress = loadProgress;
-  window.saveProgress = saveProgress;
-  window.markItemVisited = markItemVisited;
-  window.getVisitedCount = getVisitedCount;
-  
-  window.saveQuizResult = saveQuizResult;
-  window.getQuizStats = getQuizStats;
-  
-  window.saveLastVisited = saveLastVisited;
-  window.getLastVisited = getLastVisited;
-  
-  window.loadSettings = loadSettings;
-  window.saveSetting = saveSetting;
-  
-  // 高级功能
-  window.exportData = exportData;
-  window.importData = importData;
-  window.clearAllData = clearAllData;
-  window.getOverallStats = getOverallStats;
-  window.getStudyRecommendations = getStudyRecommendations;
-}
-
 // ES6 模块导出
 export {
   loadMasteredItems,
@@ -382,28 +352,3 @@ export {
   getOverallStats,
   getStudyRecommendations
 };
-
-// 如果在 Node.js 环境中，导出模块
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = {
-    loadMasteredItems,
-    saveMastered,
-    isMastered,
-    getMasteredCount,
-    loadProgress,
-    saveProgress,
-    markItemVisited,
-    getVisitedCount,
-    saveQuizResult,
-    getQuizStats,
-    saveLastVisited,
-    getLastVisited,
-    loadSettings,
-    saveSetting,
-    exportData,
-    importData,
-    clearAllData,
-    getOverallStats,
-    getStudyRecommendations
-  };
-}
